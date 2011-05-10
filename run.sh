@@ -19,20 +19,30 @@ if [ ! -f bin/django ]; then
     bin/django migrate --fake
 fi
 
+port=8000
+lsof -i :$port &> /dev/null
+statuscode=$?
+
+while [ $statuscode == 0 ]; do
+    let port=$port+1
+    lsof -i :$port &> /dev/null
+    statuscode=$?
+done
+
 function openbrowser {
-    lsof -i :8000 &> /dev/null  
+    lsof -i :$port &> /dev/null  
     loaded=$?
     while [ $loaded != 0 ]; do
         sleep 1
-        lsof -i :8000 &> /dev/null
+        lsof -i :$port &> /dev/null
         loaded=$?
     done
     if which x-www-browser &> /dev/null; then 
-        x-www-browser http://localhost:8000
+        x-www-browser http://localhost:$port
     else
-        open http://localhost:8000
+        open http://localhost:$port
     fi
 }
 
 openbrowser &
-bin/django runserver
+bin/django runserver 127.0.0.1:$port
