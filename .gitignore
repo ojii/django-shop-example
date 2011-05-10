@@ -1,0 +1,6 @@
+*.pyc
+.*
+bin/*
+bootstrap.py
+database.sqlite
+parts/*
